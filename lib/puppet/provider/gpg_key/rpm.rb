@@ -29,11 +29,15 @@ Puppet::Type.type(:gpg_key).provide(:rpm) do
   end
 
   def create
-    rpm(["--import", @resource[:path]].compact)
+    unless exists?
+      rpm(["--import", @resource[:path]].compact)
+    end
   end
 
   def destroy
-    rpm(["--erase", "gpg-pubkey-#{keyid}"].compact)
+    if exists?
+      rpm(["--erase", "gpg-pubkey-#{keyid}"].compact)
+    end
   end
 
   def keyid
