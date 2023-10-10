@@ -21,7 +21,7 @@ Puppet::Type.newtype(:gpg_key) do
     end
   end
 
-  newparam(:path) do
+  newparam(:user) do
     desc 'The user Puppet will import the key as'
     
     isnamevar
