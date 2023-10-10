@@ -8,9 +8,21 @@ Puppet::Type.type(:gpg_key).provide(:gpg) do
   defaultfor :osfamily => :suse
   confine :osfamily => [:redhat, :suse]
 
+  def run_command(command)
+    user = @resource[:user]
+    if user
+      # Use sudo to run the command as the specified user
+      sudo_command = "sudo -u #{user} #{command}"
+      execute(sudo_command, :failonfail => true)
+    else
+      execute(command, :failonfail => true)
+    end
+  end
+
   def installed_gpg_pubkeys
     command = ["gpg", "--list-keys", "--with-colons"].join(" ")
-    results = execute(command, :combine => true)
+    # results = execute(command, :combine => true)
+    results = run_command(command)
     results
   end
 
@@ -24,14 +36,18 @@ Puppet::Type.type(:gpg_key).provide(:gpg) do
 
   def create
     unless exists?
-      gpg(["--import", @resource[:path]].compact)
+      # gpg(["--import", @resource[:path]].compact)
+      gpg_path = @resource[:path]
+      run_command("gpg --import #{gpg_path}")
     end
   end
   
 
   def destroy
     if exists?
-      gpg(["--delete-key", keyid, "--yes"].compact)
+      # gpg(["--delete-key", keyid, "--yes"].compact)
+      keyid = self.keyid
+      run_command("gpg --delete-key #{keyid} --yes")
     end
   end
   
