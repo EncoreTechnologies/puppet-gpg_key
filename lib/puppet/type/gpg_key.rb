@@ -23,8 +23,6 @@ Puppet::Type.newtype(:gpg_key) do
 
   newparam(:user) do
     desc 'The user Puppet will import the key as'
-    
-    isnamevar
   end
 
   # Autorequire the file resource if it's being managed
